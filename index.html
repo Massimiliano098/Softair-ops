@@ -1,118 +1,370 @@
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ops Board — Inviti Squadre</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
 <style>
   :root{
-    --bg: #1B1F19;
-    --surface: #232821;
-    --surface-2: #2C3227;
-    --line: #3A4034;
-    --ink: #E9ECE3;
-    --ink-dim: #9AA396;
-    --amber: #D3903F;
-    --amber-dim: #7A5A30;
-    --green: #7BA35A;
-    --red: #B9573E;
-    --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
-    --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --bg:#1B1F19;
+    --surface:#232821;
+    --surface-2:#2C3227;
+    --line:#3A4034;
+    --ink:#E9ECE3;
+    --ink-dim:#9AA396;
+    --amber:#D3903F;
+    --amber-dim:#7A5A30;
+    --green:#7BA35A;
+    --red:#B9573E;
+    --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
   }
-  * { box-sizing: border-box; }
-  html,body{ margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:var(--sans); }
-  body{ padding-bottom: 90px; }
-  h1,h2,h3{ font-weight:600; margin:0; }
-  input, textarea, select, button{ font-family:inherit; }
+
+  *{box-sizing:border-box}
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+  }
+
+  body{padding-bottom:90px}
+
+  h1,h2,h3{
+    font-weight:600;
+    margin:0;
+  }
+
+  input,textarea,select,button{
+    font-family:inherit;
+  }
 
   header{
-    padding: 18px 16px 14px;
-    border-bottom: 1px solid var(--line);
-    position: sticky; top:0; background:var(--bg); z-index:10;
+    padding:18px 16px 14px;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    z-index:10;
   }
-  header .title{ font-size: 19px; letter-spacing:0.2px; }
-  header .sub{ font-family:var(--mono); font-size:12px; color:var(--ink-dim); margin-top:2px; }
+
+  header .title{
+    font-size:19px;
+    letter-spacing:.2px;
+  }
+
+  header .sub{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-dim);
+    margin-top:2px;
+  }
 
   nav.tabs{
-    position: fixed; bottom:0; left:0; right:0;
-    display:flex; background:var(--surface); border-top:1px solid var(--line);
-    z-index: 20;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    display:flex;
+    background:var(--surface);
+    border-top:1px solid var(--line);
+    z-index:20;
   }
-  nav.tabs button{
-    flex:1; padding:12px 4px 10px; background:none; border:none; color:var(--ink-dim);
-    font-size:13px; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;
-  }
-  nav.tabs button.active{ color:var(--amber); }
-  nav.tabs button .dot{ width:5px; height:5px; border-radius:50%; background:transparent; }
-  nav.tabs button.active .dot{ background:var(--amber); }
 
-  main{ padding: 14px 16px 24px; max-width: 640px; margin:0 auto; }
-  section.view{ display:none; }
-  section.view.active{ display:block; }
+  nav.tabs button{
+    flex:1;
+    padding:12px 4px 10px;
+    background:none;
+    border:none;
+    color:var(--ink-dim);
+    font-size:13px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    cursor:pointer;
+  }
+
+  nav.tabs button.active{
+    color:var(--amber);
+  }
+
+  nav.tabs button .dot{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:transparent;
+  }
+
+  nav.tabs button.active .dot{
+    background:var(--amber);
+  }
+
+  main{
+    padding:14px 16px 24px;
+    max-width:640px;
+    margin:0 auto;
+  }
+
+  section.view{
+    display:none;
+  }
+
+  section.view.active{
+    display:block;
+  }
 
   .card{
-    background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--line);
-    padding:12px 14px; margin-bottom:10px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:3px solid var(--line);
+    padding:12px 14px;
+    margin-bottom:10px;
   }
-  .card.status-invited{ border-left-color: var(--amber); }
-  .card.status-accepted{ border-left-color: var(--green); }
-  .card.status-declined{ border-left-color: var(--red); }
 
-  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .row + .row{ margin-top:8px; }
+  .card.status-invited{
+    border-left-color:var(--amber);
+  }
+
+  .card.status-accepted{
+    border-left-color:var(--green);
+  }
+
+  .card.status-declined{
+    border-left-color:var(--red);
+  }
+
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+
+  .row + .row{
+    margin-top:8px;
+  }
 
   .btn{
-    border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
-    padding:8px 12px; font-size:13px; cursor:pointer;
+    border:1px solid var(--line);
+    background:var(--surface-2);
+    color:var(--ink);
+    padding:8px 12px;
+    font-size:13px;
+    cursor:pointer;
   }
-  .btn:active{ transform: translateY(1px); }
-  .btn-primary{ background:var(--amber-dim); border-color:var(--amber); color:#FBEBD6; }
-  .btn-ghost{ background:none; border:1px solid var(--line); color:var(--ink-dim); }
-  .btn-wa{ background:#234027; border-color:#3E6B45; color:#CFEFCF; }
-  .btn-sm{ padding:5px 9px; font-size:12px; }
-  .btn:disabled{ opacity:0.4; cursor:default; }
 
-  .badge{ font-family:var(--mono); font-size:11px; padding:2px 7px; border:1px solid var(--line); color:var(--ink-dim); }
-  .badge.invited{ color:var(--amber); border-color:var(--amber-dim); }
-  .badge.accepted{ color:var(--green); border-color:#3F5A32; }
-  .badge.declined{ color:var(--red); border-color:#5A342A; }
-
-  input[type=text], input[type=tel], input[type=date], textarea{
-    width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
-    padding:9px 10px; font-size:14px;
+  .btn:active{
+    transform:translateY(1px);
   }
-  textarea{ min-height: 90px; resize: vertical; font-family: var(--mono); font-size:13px; line-height:1.5; }
-  label{ display:block; font-size:12px; color:var(--ink-dim); margin-bottom:4px; margin-top:10px; }
 
-  .empty{ color:var(--ink-dim); font-size:13px; padding: 30px 4px; text-align:center; border:1px dashed var(--line); }
+  .btn-primary{
+    background:var(--amber-dim);
+    border-color:var(--amber);
+    color:#FBEBD6;
+  }
 
-  .date-head{ font-family:var(--mono); font-size:15px; }
-  .date-note{ font-size:12px; color:var(--ink-dim); }
-  .counts{ font-family:var(--mono); font-size:11px; color:var(--ink-dim); margin-top:4px; }
+  .btn-ghost{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+  }
 
-  .team-line{ display:flex; align-items:center; gap:8px; padding:8px 0; border-top:1px solid var(--line); }
-  .team-line:first-child{ border-top:none; }
-  .team-name{ flex:1; font-size:14px; }
-  .team-phone{ font-family:var(--mono); font-size:11px; color:var(--ink-dim); }
+  .btn-wa{
+    background:#234027;
+    border-color:#3E6B45;
+    color:#CFEFCF;
+  }
 
-  .toolbar{ display:flex; gap:8px; margin-bottom: 12px; flex-wrap:wrap; }
+  .btn-sm{
+    padding:5px 9px;
+    font-size:12px;
+  }
 
-  .picker-line{ display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--line); }
-  .picker-line:first-child{ border-top:none; }
-  .picker-line input[type=checkbox]{ width:18px; height:18px; accent-color:var(--amber); }
+  .btn:disabled{
+    opacity:.4;
+    cursor:default;
+  }
 
-  .config-box{ border:1px solid var(--amber-dim); background:#2A2415; padding:12px 14px; font-size:13px; margin-bottom:14px; }
-  .config-box code{ font-family:var(--mono); font-size:12px; background:var(--surface-2); padding:1px 4px; }
+  .badge{
+    font-family:var(--mono);
+    font-size:11px;
+    padding:2px 7px;
+    border:1px solid var(--line);
+    color:var(--ink-dim);
+  }
 
-  .hint{ font-size:12px; color:var(--ink-dim); margin-top:6px; }
-  .modal-bg{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:flex-end; z-index:30; }
-  .modal-bg.open{ display:flex; }
-  .modal{ background:var(--surface); border-top:1px solid var(--line); width:100%; padding:16px; max-height:80vh; overflow:auto; }
-  .modal h3{ margin-bottom:10px; }
-  .close-row{ display:flex; justify-content:flex-end; margin-top:12px; }
+  .badge.invited{
+    color:var(--amber);
+    border-color:var(--amber-dim);
+  }
+
+  .badge.accepted{
+    color:var(--green);
+    border-color:#3F5A32;
+  }
+
+  .badge.declined{
+    color:var(--red);
+    border-color:#5A342A;
+  }
+
+  input[type=text],
+  input[type=tel],
+  input[type=date],
+  textarea{
+    width:100%;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:9px 10px;
+    font-size:14px;
+  }
+
+  textarea{
+    min-height:90px;
+    resize:vertical;
+    font-family:var(--mono);
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  label{
+    display:block;
+    font-size:12px;
+    color:var(--ink-dim);
+    margin-bottom:4px;
+    margin-top:10px;
+  }
+
+  .empty{
+    color:var(--ink-dim);
+    font-size:13px;
+    padding:30px 4px;
+    text-align:center;
+    border:1px dashed var(--line);
+  }
+
+  .date-head{
+    font-family:var(--mono);
+    font-size:15px;
+  }
+
+  .date-note{
+    font-size:12px;
+    color:var(--ink-dim);
+  }
+
+  .counts{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-dim);
+    margin-top:4px;
+  }
+
+  .team-line{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 0;
+    border-top:1px solid var(--line);
+  }
+
+  .team-line:first-child{
+    border-top:none;
+  }
+
+  .team-name{
+    flex:1;
+    font-size:14px;
+  }
+
+  .team-phone{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-dim);
+  }
+
+  .toolbar{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+
+  .picker-line{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 0;
+    border-top:1px solid var(--line);
+  }
+
+  .picker-line:first-child{
+    border-top:none;
+  }
+
+  .config-box{
+    border:1px solid var(--amber-dim);
+    background:#2A2415;
+    padding:12px 14px;
+    font-size:13px;
+    margin-bottom:14px;
+  }
+
+  .config-box code{
+    font-family:var(--mono);
+    font-size:12px;
+    background:var(--surface-2);
+    padding:1px 4px;
+  }
+
+  .hint{
+    font-size:12px;
+    color:var(--ink-dim);
+    margin-top:6px;
+  }
+
+  .modal-bg{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    align-items:flex-end;
+    z-index:30;
+  }
+
+  .modal-bg.open{
+    display:flex;
+  }
+
+  .modal{
+    background:var(--surface);
+    border-top:1px solid var(--line);
+    width:100%;
+    padding:16px;
+    max-height:80vh;
+    overflow:auto;
+  }
+
+  .modal h3{
+    margin-bottom:10px;
+  }
+
+  .close-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:12px;
+  }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -122,17 +374,13 @@
 
 <main>
 
-  <!-- ============ CONFIG (mostrata solo se mancano le credenziali) ============ -->
   <section class="view" id="view-config">
     <div class="config-box">
       <strong>Configurazione mancante.</strong><br>
-      Apri questo file con un editor di testo, cerca <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code>
-      all'inizio del codice (tag &lt;script&gt; in fondo alla pagina) e inserisci i valori del tuo progetto Supabase
-      (Project Settings → API). Poi ricarica la pagina.
+      Controlla le credenziali Supabase nel codice.
     </div>
   </section>
 
-  <!-- ============ TAB: PARTITE ============ -->
   <section class="view" id="view-dates">
     <div class="toolbar">
       <button class="btn btn-primary" id="btn-new-date">+ Nuova data</button>
@@ -140,7 +388,6 @@
     <div id="dates-list"></div>
   </section>
 
-  <!-- ============ TAB: SQUADRE ============ -->
   <section class="view" id="view-teams">
     <div class="toolbar">
       <button class="btn btn-primary" id="btn-new-team">+ Nuova squadra</button>
@@ -148,422 +395,1115 @@
     <div id="teams-list"></div>
   </section>
 
-  <!-- ============ TAB: MESSAGGIO ============ -->
   <section class="view" id="view-settings">
     <label>Template messaggio invito</label>
+
     <textarea id="template-text"></textarea>
-    <div class="hint">Segnaposto disponibili: <code>{squadra}</code> e <code>{data}</code>. Vengono sostituiti automaticamente prima di aprire WhatsApp.</div>
+
+    <div class="hint">
+      Segnaposto disponibili:
+      <code>{squadra}</code>
+      e
+      <code>{data}</code>.
+      Vengono sostituiti automaticamente prima di aprire WhatsApp.
+    </div>
+
     <div class="toolbar" style="margin-top:12px;">
-      <button class="btn btn-primary" id="btn-save-template">Salva template</button>
+      <button class="btn btn-primary" id="btn-save-template">
+        Salva template
+      </button>
     </div>
   </section>
 
 </main>
 
 <nav class="tabs">
-  <button data-tab="dates" class="active"><span class="dot"></span>Partite</button>
-  <button data-tab="teams"><span class="dot"></span>Squadre</button>
-  <button data-tab="settings"><span class="dot"></span>Messaggio</button>
+  <button data-tab="dates" class="active">
+    <span class="dot"></span>
+    Partite
+  </button>
+
+  <button data-tab="teams">
+    <span class="dot"></span>
+    Squadre
+  </button>
+
+  <button data-tab="settings">
+    <span class="dot"></span>
+    Messaggio
+  </button>
 </nav>
 
-<!-- ============ MODALE: dettaglio data / inviti ============ -->
 <div class="modal-bg" id="modal-date">
   <div class="modal">
     <h3 id="modal-date-title">Data</h3>
     <div id="modal-date-body"></div>
-    <div class="close-row"><button class="btn" data-close="modal-date">Chiudi</button></div>
+
+    <div class="close-row">
+      <button class="btn" data-close="modal-date">
+        Chiudi
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- ============ MODALE: nuova data ============ -->
 <div class="modal-bg" id="modal-new-date">
   <div class="modal">
+
     <h3>Nuova data di gioco</h3>
+
     <label>Data</label>
     <input type="date" id="input-new-date">
+
     <label>Nota (opzionale)</label>
-    <input type="text" id="input-new-date-note" placeholder="es: campo nord, mattina">
+    <input
+      type="text"
+      id="input-new-date-note"
+      placeholder="es: campo nord, mattina"
+    >
+
     <div class="close-row">
-      <button class="btn btn-ghost" data-close="modal-new-date">Annulla</button>
-      <button class="btn btn-primary" id="confirm-new-date" style="margin-left:8px;">Crea</button>
+      <button class="btn btn-ghost" data-close="modal-new-date">
+        Annulla
+      </button>
+
+      <button
+        class="btn btn-primary"
+        id="confirm-new-date"
+        style="margin-left:8px;"
+      >
+        Crea
+      </button>
     </div>
+
   </div>
 </div>
 
-<!-- ============ MODALE: nuova squadra ============ -->
 <div class="modal-bg" id="modal-new-team">
   <div class="modal">
-    <h3>Nuova squadra</h3>
-    <label>Nome squadra</label>
-    <input type="text" id="input-new-team-name" placeholder="es: Team Alpha">
-    <label>Numero WhatsApp</label>
-    <input type="tel" id="input-new-team-phone" placeholder="393331234567 (senza + o spazi)">
-    <label>Note (opzionale)</label>
-    <input type="text" id="input-new-team-notes" placeholder="referente, giocatori, etc.">
-    <div class="close-row">
-      <button class="btn btn-ghost" data-close="modal-new-team">Annulla</button>
-      <button class="btn btn-primary" id="confirm-new-team" style="margin-left:8px;">Aggiungi</button>
-    </div>
-  </div>
-</div>
 
-<!-- ============ MODALE: invito ricevuto ============ -->
-<div class="modal-bg" id="modal-received-invite">
-  <div class="modal">
-    <h3>📥 Nuovo invito ricevuto</h3>
-    <label>Squadra</label>
-    <select id="input-received-team" style="width:100%; background:var(--surface-2); border:1px solid var(--line); color:var(--ink); padding:9px 10px; font-size:14px;"></select>
-    <label>Nota (opzionale)</label>
-    <input type="text" id="input-received-notes" placeholder="es: ci hanno invitati al campo nord">
+    <h3>Nuova squadra</h3>
+
+    <label>Nome squadra</label>
+
+    <input
+      type="text"
+      id="input-new-team-name"
+      placeholder="es: Team Alpha"
+    >
+
+    <label>Numero WhatsApp</label>
+
+    <input
+      type="tel"
+      id="input-new-team-phone"
+      placeholder="393331234567 (senza + o spazi)"
+    >
+
+    <label>Note (opzionale)</label>
+
+    <input
+      type="text"
+      id="input-new-team-notes"
+      placeholder="referente, giocatori, etc."
+    >
+
     <div class="close-row">
-      <button class="btn btn-ghost" data-close="modal-received-invite">Annulla</button>
-      <button class="btn btn-primary" id="confirm-received-invite" style="margin-left:8px;">Salva</button>
+
+      <button
+        class="btn btn-ghost"
+        data-close="modal-new-team"
+      >
+        Annulla
+      </button>
+
+      <button
+        class="btn btn-primary"
+        id="confirm-new-team"
+        style="margin-left:8px;"
+      >
+        Aggiungi
+      </button>
+
     </div>
+
   </div>
 </div>
 
 <script>
+
 /* ================================================================
-   CONFIGURAZIONE — inserisci qui i tuoi dati Supabase
-   (Project Settings → API nel tuo progetto Supabase)
+   SUPABASE
+   ================================================================
+
+   IMPORTANTE:
+   createClient() vuole l'URL BASE del progetto.
+
+   NON mettere:
+   /rest/v1/
+
+   La libreria Supabase aggiunge automaticamente il percorso REST.
    ================================================================ */
-const SUPABASE_URL = "https://wockxozjefbdngxypobi.supabase.co/rest/v1/";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvY2t4b3pqZWZiZG5neHlwb2JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MDIzOTcsImV4cCI6MjEwNDk3ODM5N30.L89inOYWjZe9QHRY1H6r9sQKvWd0uQ3-ny-mUBeNR7U";
-/* ================================================================ */
+
+const SUPABASE_URL =
+  "https://wockxozjefbdngxypobi.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvY2t4b3pqZWZiZG5neHlwb2JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MDIzOTcsImV4cCI6MjEwNDk3ODM5N30.L89inOYWjZe9QHRY1H6r9sQKvWd0uQ3-ny-mUBeNR7U";
 
 let sb = null;
+
 let TEAMS = [];
 let DATES = [];
 let currentDateId = null;
 
 function fmtDate(d){
+
   const dt = new Date(d + "T00:00:00");
-  return dt.toLocaleDateString('it-IT', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+
+  return dt.toLocaleDateString(
+    "it-IT",
+    {
+      weekday:"short",
+      day:"2-digit",
+      month:"short",
+      year:"numeric"
+    }
+  );
 }
 
 function show(id){
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+
+  document
+    .querySelectorAll(".view")
+    .forEach(v => v.classList.remove("active"));
+
+  document
+    .getElementById(id)
+    .classList.add("active");
 }
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('[data-close]').forEach(b=>{
-  b.addEventListener('click', ()=> closeModal(b.dataset.close));
+
+function openModal(id){
+  document.getElementById(id).classList.add("open");
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove("open");
+}
+
+document.querySelectorAll("[data-close]").forEach(button => {
+
+  button.addEventListener("click", () => {
+    closeModal(button.dataset.close);
+  });
+
 });
 
-document.querySelectorAll('nav.tabs button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    show('view-' + btn.dataset.tab);
+document.querySelectorAll("nav.tabs button").forEach(btn => {
+
+  btn.addEventListener("click", () => {
+
+    document
+      .querySelectorAll("nav.tabs button")
+      .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    show("view-" + btn.dataset.tab);
+
   });
+
 });
+
+/* ================================================================
+   INIZIALIZZAZIONE
+   ================================================================ */
 
 async function init(){
-  if(SUPABASE_URL.startsWith("INSERISCI") || SUPABASE_ANON_KEY.startsWith("INSERISCI")){
-    show('view-config');
-    document.getElementById('header-sub').textContent = "configurazione richiesta";
-    return;
+
+  try{
+
+    if(
+      SUPABASE_URL.startsWith("INSERISCI") ||
+      SUPABASE_ANON_KEY.startsWith("INSERISCI")
+    ){
+
+      show("view-config");
+
+      document.getElementById("header-sub").textContent =
+        "configurazione richiesta";
+
+      return;
+    }
+
+    sb = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    document.getElementById("header-sub").textContent =
+      "connessione…";
+
+    await loadTeams();
+    await loadDates();
+    await loadTemplate();
+
+    document.getElementById("header-sub").textContent =
+      "connesso";
+
+    show("view-dates");
+
+  }catch(error){
+
+    console.error(error);
+
+    document.getElementById("header-sub").textContent =
+      "errore di connessione";
+
+    alert(
+      "Errore di connessione a Supabase: " +
+      (error.message || error)
+    );
+
   }
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  document.getElementById('header-sub').textContent = "connesso";
-  await loadTeams();
-  await loadDates();
-  await loadTemplate();
-  show('view-dates');
+
 }
 
-/* ---------------- SQUADRE ---------------- */
+/* ================================================================
+   SQUADRE
+   ================================================================ */
+
 async function loadTeams(){
-  const { data, error } = await sb.from('teams').select('*').order('name');
-  if(error){ alert('Errore caricamento squadre: ' + error.message); return; }
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("teams")
+    .select("*")
+    .order("name");
+
+  if(error){
+
+    console.error("loadTeams:", error);
+
+    alert(
+      "Errore caricamento squadre: " +
+      error.message
+    );
+
+    return;
+  }
+
   TEAMS = data || [];
+
   renderTeams();
 }
 
 function renderTeams(){
-  const el = document.getElementById('teams-list');
+
+  const el =
+    document.getElementById("teams-list");
+
   if(TEAMS.length === 0){
-    el.innerHTML = '<div class="empty">Nessuna squadra ancora. Aggiungine una con il pulsante sopra.</div>';
+
+    el.innerHTML =
+      '<div class="empty">' +
+      'Nessuna squadra ancora. ' +
+      'Aggiungine una con il pulsante sopra.' +
+      '</div>';
+
     return;
   }
+
   el.innerHTML = TEAMS.map(t => `
+
     <div class="card">
-      <div class="team-line" style="border-top:none;">
+
+      <div
+        class="team-line"
+        style="border-top:none;"
+      >
+
         <div style="flex:1;">
-          <div class="team-name">${escapeHtml(t.name)}</div>
-          <div class="team-phone">${t.phone ? '+' + t.phone : 'nessun numero'}</div>
+
+          <div class="team-name">
+            ${escapeHtml(t.name)}
+          </div>
+
+          <div class="team-phone">
+            ${t.phone ? "+" + t.phone : "nessun numero"}
+          </div>
+
         </div>
-        <button class="btn btn-sm" onclick="deleteTeam('${t.id}')">Elimina</button>
+
+        <button
+          class="btn btn-sm"
+          onclick="deleteTeam('${t.id}')"
+        >
+          Elimina
+        </button>
+
       </div>
-      ${t.notes ? `<div class="hint">${escapeHtml(t.notes)}</div>` : ''}
+
+      ${
+        t.notes
+        ? `<div class="hint">${escapeHtml(t.notes)}</div>`
+        : ""
+      }
+
     </div>
-  `).join('');
+
+  `).join("");
 }
 
-document.getElementById('btn-new-team').addEventListener('click', ()=> openModal('modal-new-team'));
-document.getElementById('confirm-new-team').addEventListener('click', async ()=>{
-  const name = document.getElementById('input-new-team-name').value.trim();
-  let phone = document.getElementById('input-new-team-phone').value.trim().replace(/\D/g,'');
-  const notes = document.getElementById('input-new-team-notes').value.trim();
-  if(!name){ alert('Inserisci il nome della squadra'); return; }
-  const { error } = await sb.from('teams').insert({ name, phone, notes });
-  if(error){ alert('Errore: ' + error.message); return; }
-  document.getElementById('input-new-team-name').value = '';
-  document.getElementById('input-new-team-phone').value = '';
-  document.getElementById('input-new-team-notes').value = '';
-  closeModal('modal-new-team');
-  await loadTeams();
-});
+document
+  .getElementById("btn-new-team")
+  .addEventListener("click", () => {
+
+    openModal("modal-new-team");
+
+  });
+
+document
+  .getElementById("confirm-new-team")
+  .addEventListener("click", async () => {
+
+    const name =
+      document
+        .getElementById("input-new-team-name")
+        .value
+        .trim();
+
+    let phone =
+      document
+        .getElementById("input-new-team-phone")
+        .value
+        .trim()
+        .replace(/\D/g,"");
+
+    const notes =
+      document
+        .getElementById("input-new-team-notes")
+        .value
+        .trim();
+
+    if(!name){
+
+      alert("Inserisci il nome della squadra");
+
+      return;
+    }
+
+    const {
+      error
+    } = await sb
+      .from("teams")
+      .insert({
+        name,
+        phone,
+        notes
+      });
+
+    if(error){
+
+      alert(
+        "Errore: " +
+        error.message
+      );
+
+      return;
+    }
+
+    document.getElementById(
+      "input-new-team-name"
+    ).value = "";
+
+    document.getElementById(
+      "input-new-team-phone"
+    ).value = "";
+
+    document.getElementById(
+      "input-new-team-notes"
+    ).value = "";
+
+    closeModal("modal-new-team");
+
+    await loadTeams();
+
+  });
 
 async function deleteTeam(id){
-  if(!confirm('Eliminare questa squadra? Verranno rimossi anche i suoi inviti.')) return;
-  const { error } = await sb.from('teams').delete().eq('id', id);
-  if(error){ alert('Errore: ' + error.message); return; }
+
+  if(
+    !confirm(
+      "Eliminare questa squadra? " +
+      "Verranno rimossi anche i suoi inviti."
+    )
+  ){
+
+    return;
+  }
+
+  const {
+    error
+  } = await sb
+    .from("teams")
+    .delete()
+    .eq("id", id);
+
+  if(error){
+
+    alert(
+      "Errore: " +
+      error.message
+    );
+
+    return;
+  }
+
   await loadTeams();
+
 }
 
-/* ---------------- DATE / PARTITE ---------------- */
+/* ================================================================
+   DATE / PARTITE
+   ================================================================ */
+
 async function loadDates(){
-  const { data, error } = await sb.from('match_dates').select('*').order('date');
-  if(error){ alert('Errore caricamento date: ' + error.message); return; }
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("match_dates")
+    .select("*")
+    .order("date");
+
+  if(error){
+
+    console.error("loadDates:", error);
+
+    alert(
+      "Errore caricamento date: " +
+      error.message
+    );
+
+    return;
+  }
+
   DATES = data || [];
+
   await renderDates();
+
 }
 
 async function renderDates(){
-  const el = document.getElementById('dates-list');
+
+  const el =
+    document.getElementById("dates-list");
+
   if(DATES.length === 0){
-    el.innerHTML = '<div class="empty">Nessuna data ancora. Crea la prima partita con il pulsante sopra.</div>';
+
+    el.innerHTML =
+      '<div class="empty">' +
+      'Nessuna data ancora. ' +
+      'Crea la prima partita con il pulsante sopra.' +
+      '</div>';
+
     return;
   }
-  const { data: invs } = await sb.from('invitations').select('*');
+
+  const {
+    data: invs,
+    error
+  } = await sb
+    .from("invitations")
+    .select("*");
+
+  if(error){
+
+    console.error("renderDates:", error);
+
+  }
+
   el.innerHTML = DATES.map(d => {
-    const forDate = (invs||[]).filter(i => i.match_date_id === d.id);
-    const invited = forDate.filter(i=>i.status==='invited').length;
-    const accepted = forDate.filter(i=>i.status==='accepted').length;
-    const declined = forDate.filter(i=>i.status==='declined').length;
+
+    const forDate =
+      (invs || [])
+        .filter(
+          i => i.match_date_id === d.id
+        );
+
+    const invited =
+      forDate.filter(
+        i => i.status === "invited"
+      ).length;
+
+    const accepted =
+      forDate.filter(
+        i => i.status === "accepted"
+      ).length;
+
+    const declined =
+      forDate.filter(
+        i => i.status === "declined"
+      ).length;
+
     return `
-      <div class="card" onclick="openDate('${d.id}')" style="cursor:pointer;">
-        <div class="date-head">${fmtDate(d.date)}</div>
-        ${d.note ? `<div class="date-note">${escapeHtml(d.note)}</div>` : ''}
-        <div class="counts">invitate ${invited} · accettate ${accepted} · rifiutate ${declined}</div>
+
+      <div
+        class="card"
+        onclick="openDate('${d.id}')"
+        style="cursor:pointer;"
+      >
+
+        <div class="date-head">
+          ${fmtDate(d.date)}
+        </div>
+
+        ${
+          d.note
+          ? `<div class="date-note">
+              ${escapeHtml(d.note)}
+            </div>`
+          : ""
+        }
+
+        <div class="counts">
+          invitate ${invited}
+          · accettate ${accepted}
+          · rifiutate ${declined}
+        </div>
+
       </div>
+
     `;
-  }).join('');
+
+  }).join("");
+
 }
 
-document.getElementById('btn-new-date').addEventListener('click', ()=> openModal('modal-new-date'));
-document.getElementById('confirm-new-date').addEventListener('click', async ()=>{
-  const date = document.getElementById('input-new-date').value;
-  const note = document.getElementById('input-new-date-note').value.trim();
-  if(!date){ alert('Seleziona una data'); return; }
-  const { error } = await sb.from('match_dates').insert({ date, note });
-  if(error){ alert('Errore: ' + error.message); return; }
-  document.getElementById('input-new-date').value = '';
-  document.getElementById('input-new-date-note').value = '';
-  closeModal('modal-new-date');
-  await loadDates();
-});
+document
+  .getElementById("btn-new-date")
+  .addEventListener("click", () => {
+
+    openModal("modal-new-date");
+
+  });
+
+document
+  .getElementById("confirm-new-date")
+  .addEventListener("click", async () => {
+
+    const date =
+      document
+        .getElementById("input-new-date")
+        .value;
+
+    const note =
+      document
+        .getElementById("input-new-date-note")
+        .value
+        .trim();
+
+    if(!date){
+
+      alert("Seleziona una data");
+
+      return;
+    }
+
+    const {
+      error
+    } = await sb
+      .from("match_dates")
+      .insert({
+        date,
+        note
+      });
+
+    if(error){
+
+      alert(
+        "Errore: " +
+        error.message
+      );
+
+      return;
+    }
+
+    document.getElementById(
+      "input-new-date"
+    ).value = "";
+
+    document.getElementById(
+      "input-new-date-note"
+    ).value = "";
+
+    closeModal("modal-new-date");
+
+    await loadDates();
+
+  });
 
 async function openDate(dateId){
+
   currentDateId = dateId;
-  const d = DATES.find(x=>x.id===dateId);
-  document.getElementById('modal-date-title').textContent = fmtDate(d.date) + (d.note ? ' — ' + d.note : '');
+
+  const d =
+    DATES.find(
+      x => x.id === dateId
+    );
+
+  if(!d){
+
+    alert("Data non trovata.");
+
+    return;
+  }
+
+  document.getElementById(
+    "modal-date-title"
+  ).textContent =
+    fmtDate(d.date) +
+    (d.note ? " — " + d.note : "");
+
   await renderDateBody();
-  openModal('modal-date');
+
+  openModal("modal-date");
+
 }
 
 async function renderDateBody(){
-  const { data: invs, error } = await sb.from('invitations').select('*').eq('match_date_id', currentDateId);
-  if(error){ alert('Errore: ' + error.message); return; }
+
+  const {
+    data: invs,
+    error
+  } = await sb
+    .from("invitations")
+    .select("*")
+    .eq("match_date_id", currentDateId);
+
+  if(error){
+
+    alert(
+      "Errore: " +
+      error.message
+    );
+
+    return;
+  }
+
   const invMap = {};
-  (invs||[]).forEach(i => invMap[i.team_id] = i);
 
-  const invitedTeams = TEAMS.filter(t => invMap[t.id]);
-  const notInvitedTeams = TEAMS.filter(t => !invMap[t.id]);
+  (invs || []).forEach(i => {
 
-  let html = '';
+    invMap[i.team_id] = i;
+
+  });
+
+  const invitedTeams =
+    TEAMS.filter(
+      t => invMap[t.id]
+    );
+
+  const notInvitedTeams =
+    TEAMS.filter(
+      t => !invMap[t.id]
+    );
+
+  let html = "";
 
   if(invitedTeams.length){
+
     html += invitedTeams.map(t => {
-      const inv = invMap[t.id];
+
+      const inv =
+        invMap[t.id];
+
       return `
+
         <div class="card status-${inv.status}">
+
           <div class="row">
-            <div class="team-name">${escapeHtml(t.name)}</div>
-            <span class="badge ${inv.status}">${labelStatus(inv.status)}</span>
+
+            <div class="team-name">
+              ${escapeHtml(t.name)}
+            </div>
+
+            <span class="badge ${inv.status}">
+              ${labelStatus(inv.status)}
+            </span>
+
           </div>
-          <div class="row" style="margin-top:8px; gap:6px;">
-            ${inv.status !== 'invited' ? '' : `<button class="btn btn-wa btn-sm" onclick="sendWhatsapp('${t.id}', true)">Reinvia WhatsApp</button>`}
-            <button class="btn btn-sm" style="border-color:#3F5A32; color:#BFE3A6;" onclick="setStatus('${t.id}','accepted')">Accettato</button>
-            <button class="btn btn-sm" style="border-color:#5A342A; color:#E3B3A6;" onclick="setStatus('${t.id}','declined')">Rifiutato</button>
+
+          <div
+            class="row"
+            style="margin-top:8px;gap:6px;"
+          >
+
+            ${
+              inv.status !== "invited"
+              ? ""
+              : `
+                <button
+                  class="btn btn-wa btn-sm"
+                  onclick="sendWhatsapp('${t.id}',true)"
+                >
+                  Reinvia WhatsApp
+                </button>
+              `
+            }
+
+            <button
+              class="btn btn-sm"
+              style="border-color:#3F5A32;color:#BFE3A6;"
+              onclick="setStatus('${t.id}','accepted')"
+            >
+              Accettato
+            </button>
+
+            <button
+              class="btn btn-sm"
+              style="border-color:#5A342A;color:#E3B3A6;"
+              onclick="setStatus('${t.id}','declined')"
+            >
+              Rifiutato
+            </button>
+
           </div>
+
         </div>
+
       `;
-    }).join('');
+
+    }).join("");
+
   }
 
   if(notInvitedTeams.length){
-    html += `<div class="hint" style="margin:14px 0 6px;">Squadre non ancora invitate per questa data</div>`;
+
+    html += `
+      <div
+        class="hint"
+        style="margin:14px 0 6px;"
+      >
+        Squadre non ancora invitate per questa data
+      </div>
+    `;
+
     html += notInvitedTeams.map(t => `
+
       <div class="picker-line">
-        <div class="team-name">${escapeHtml(t.name)}</div>
-        <button class="btn btn-wa btn-sm" onclick="sendWhatsapp('${t.id}', false)" ${t.phone ? '' : 'disabled title="nessun numero salvato"'}>Invita WhatsApp</button>
+
+        <div class="team-name">
+          ${escapeHtml(t.name)}
+        </div>
+
+        <button
+          class="btn btn-wa btn-sm"
+          onclick="sendWhatsapp('${t.id}',false)"
+          ${t.phone
+            ? ""
+            : 'disabled title="nessun numero salvato"'}
+        >
+          Invita WhatsApp
+        </button>
+
       </div>
-    `).join('');
+
+    `).join("");
+
   }
 
-  if(!invitedTeams.length && !notInvitedTeams.length){
-    html = '<div class="empty">Aggiungi prima qualche squadra nella tab Squadre.</div>';
+  if(
+    !invitedTeams.length &&
+    !notInvitedTeams.length
+  ){
+
+    html =
+      '<div class="empty">' +
+      'Aggiungi prima qualche squadra nella tab Squadre.' +
+      '</div>';
+
   }
 
-  // ---------------- INVITI RICEVUTI ----------------
-  const { data: received, error: receivedError } = await sb
-    .from('received_invitations')
-    .select('*, teams(name)')
-    .eq('match_date_id', currentDateId)
-    .order('created_at');
+  document.getElementById(
+    "modal-date-body"
+  ).innerHTML = html;
 
-  if(receivedError){
-    console.warn('Inviti ricevuti:', receivedError.message);
-  }
-
-  html += `
-    <div style="margin-top:18px; padding-top:14px; border-top:1px solid var(--line);">
-      <div class="row" style="margin-bottom:8px;">
-        <strong>📥 Inviti ricevuti</strong>
-        <button class="btn btn-primary btn-sm" onclick="openReceivedInviteModal()">+ Aggiungi</button>
-      </div>
-      <div id="received-invites-list">
-        ${
-          (received && received.length)
-          ? received.map(r => `
-              <div class="team-line">
-                <div style="flex:1;">
-                  <div class="team-name">${escapeHtml(r.teams?.name || 'Squadra')}</div>
-                  ${r.notes ? `<div class="hint">${escapeHtml(r.notes)}</div>` : ''}
-                </div>
-                <button class="btn btn-sm" onclick="deleteReceivedInvite('${r.id}')">Elimina</button>
-              </div>
-            `).join('')
-          : '<div class="empty">Nessun invito ricevuto registrato per questa data.</div>'
-        }
-      </div>
-    </div>
-  `;
-
-  document.getElementById('modal-date-body').innerHTML = html;
 }
 
 function labelStatus(s){
-  return s === 'invited' ? 'Invitata' : s === 'accepted' ? 'Accettata' : 'Rifiutata';
+
+  return s === "invited"
+    ? "Invitata"
+    : s === "accepted"
+      ? "Accettata"
+      : "Rifiutata";
+
 }
 
-let MESSAGE_TEMPLATE = 'Ciao {squadra}! Vi va di venire a giocare da noi il {data}? Fateci sapere! 🎯';
+/* ================================================================
+   WHATSAPP
+   ================================================================ */
 
-async function sendWhatsapp(teamId, alreadyInvited){
-  const team = TEAMS.find(t=>t.id===teamId);
-  const d = DATES.find(x=>x.id===currentDateId);
-  if(!team.phone){ alert('Questa squadra non ha un numero WhatsApp salvato.'); return; }
+let MESSAGE_TEMPLATE =
+  "Ciao {squadra}! Vi va di venire a giocare da noi il {data}? Fateci sapere! 🎯";
 
-  const msg = MESSAGE_TEMPLATE
-    .replace(/{squadra}/g, team.name)
-    .replace(/{data}/g, fmtDate(d.date));
+async function sendWhatsapp(
+  teamId,
+  alreadyInvited
+){
 
-  const url = `https://wa.me/${team.phone}?text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
+  const team =
+    TEAMS.find(
+      t => t.id === teamId
+    );
 
-  // segna automaticamente come invitata
-  const nowIso = new Date().toISOString();
+  const d =
+    DATES.find(
+      x => x.id === currentDateId
+    );
+
+  if(!team){
+
+    alert("Squadra non trovata.");
+
+    return;
+  }
+
+  if(!d){
+
+    alert("Data non trovata.");
+
+    return;
+  }
+
+  if(!team.phone){
+
+    alert(
+      "Questa squadra non ha un numero WhatsApp salvato."
+    );
+
+    return;
+  }
+
+  const msg =
+    MESSAGE_TEMPLATE
+      .replace(
+        /{squadra}/g,
+        team.name
+      )
+      .replace(
+        /{data}/g,
+        fmtDate(d.date)
+      );
+
+  const url =
+    `https://wa.me/${team.phone}?text=${encodeURIComponent(msg)}`;
+
+  window.open(url,"_blank");
+
+  const nowIso =
+    new Date().toISOString();
+
+  let result;
+
   if(alreadyInvited){
-    await sb.from('invitations').update({ invited_at: nowIso, status: 'invited' })
-      .eq('team_id', teamId).eq('match_date_id', currentDateId);
-  } else {
-    await sb.from('invitations').upsert({
-      team_id: teamId, match_date_id: currentDateId, status: 'invited', invited_at: nowIso
-    }, { onConflict: 'team_id,match_date_id' });
+
+    result =
+      await sb
+        .from("invitations")
+        .update({
+          invited_at:nowIso,
+          status:"invited"
+        })
+        .eq("team_id",teamId)
+        .eq("match_date_id",currentDateId);
+
+  }else{
+
+    result =
+      await sb
+        .from("invitations")
+        .upsert(
+          {
+            team_id:teamId,
+            match_date_id:currentDateId,
+            status:"invited",
+            invited_at:nowIso
+          },
+          {
+            onConflict:"team_id,match_date_id"
+          }
+        );
+
   }
+
+  if(result.error){
+
+    console.error(
+      "Errore salvataggio invito:",
+      result.error
+    );
+
+    alert(
+      "WhatsApp è stato aperto, " +
+      "ma non è stato possibile salvare l'invito: " +
+      result.error.message
+    );
+
+    return;
+  }
+
   await renderDateBody();
   await renderDates();
+
 }
 
-async function setStatus(teamId, status){
-  const { error } = await sb.from('invitations')
-    .update({ status, responded_at: new Date().toISOString() })
-    .eq('team_id', teamId).eq('match_date_id', currentDateId);
-  if(error){ alert('Errore: ' + error.message); return; }
+/* ================================================================
+   STATI INVITO
+   ================================================================ */
+
+async function setStatus(
+  teamId,
+  status
+){
+
+  const {
+    error
+  } = await sb
+    .from("invitations")
+    .update({
+      status,
+      responded_at:
+        new Date().toISOString()
+    })
+    .eq("team_id",teamId)
+    .eq("match_date_id",currentDateId);
+
+  if(error){
+
+    alert(
+      "Errore: " +
+      error.message
+    );
+
+    return;
+  }
+
   await renderDateBody();
   await renderDates();
+
 }
 
-/* ---------------- INVITI RICEVUTI ---------------- */
-function openReceivedInviteModal(){
-  const select = document.getElementById('input-received-team');
-  select.innerHTML = TEAMS.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+/* ================================================================
+   TEMPLATE MESSAGGIO
+   ================================================================ */
 
-  if(!TEAMS.length){
-    alert('Aggiungi prima almeno una squadra nella tab Squadre.');
-    return;
-  }
-
-  document.getElementById('input-received-notes').value = '';
-  openModal('modal-received-invite');
-}
-
-document.getElementById('confirm-received-invite').addEventListener('click', async ()=>{
-  const teamId = document.getElementById('input-received-team').value;
-  const notes = document.getElementById('input-received-notes').value.trim();
-
-  if(!teamId || !currentDateId) return;
-
-  const { error } = await sb.from('received_invitations').upsert({
-    team_id: teamId,
-    match_date_id: currentDateId,
-    notes
-  }, { onConflict: 'team_id,match_date_id' });
-
-  if(error){
-    alert('Errore: ' + error.message);
-    return;
-  }
-
-  closeModal('modal-received-invite');
-  await renderDateBody();
-});
-
-async function deleteReceivedInvite(id){
-  if(!confirm('Eliminare questo invito ricevuto?')) return;
-
-  const { error } = await sb.from('received_invitations').delete().eq('id', id);
-  if(error){
-    alert('Errore: ' + error.message);
-    return;
-  }
-
-  await renderDateBody();
-}
-
-/* ---------------- TEMPLATE MESSAGGIO ---------------- */
 async function loadTemplate(){
-  const { data, error } = await sb.from('settings').select('*').eq('id', 1).single();
-  if(error){ console.warn(error.message); return; }
-  MESSAGE_TEMPLATE = data.message_template;
-  document.getElementById('template-text').value = MESSAGE_TEMPLATE;
+
+  const {
+    data,
+    error
+  } = await sb
+    .from("settings")
+    .select("*")
+    .eq("id",1)
+    .single();
+
+  if(error){
+
+    console.warn(
+      "Template non caricato:",
+      error.message
+    );
+
+    document.getElementById(
+      "template-text"
+    ).value =
+      MESSAGE_TEMPLATE;
+
+    return;
+  }
+
+  if(data && data.message_template){
+
+    MESSAGE_TEMPLATE =
+      data.message_template;
+
+  }
+
+  document.getElementById(
+    "template-text"
+  ).value =
+    MESSAGE_TEMPLATE;
+
 }
-document.getElementById('btn-save-template').addEventListener('click', async ()=>{
-  const val = document.getElementById('template-text').value;
-  const { error } = await sb.from('settings').update({ message_template: val }).eq('id', 1);
-  if(error){ alert('Errore: ' + error.message); return; }
-  MESSAGE_TEMPLATE = val;
-  alert('Template salvato.');
-});
+
+document
+  .getElementById("btn-save-template")
+  .addEventListener("click",async () => {
+
+    const val =
+      document.getElementById(
+        "template-text"
+      ).value;
+
+    const {
+      error
+    } = await sb
+      .from("settings")
+      .update({
+        message_template:val
+      })
+      .eq("id",1);
+
+    if(error){
+
+      alert(
+        "Errore: " +
+        error.message
+      );
+
+      return;
+    }
+
+    MESSAGE_TEMPLATE = val;
+
+    alert("Template salvato.");
+
+  });
+
+/* ================================================================
+   SICUREZZA HTML
+   ================================================================ */
 
 function escapeHtml(s){
-  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  return (s || "").replace(
+    /[&<>"']/g,
+    c => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[c])
+  );
+
 }
 
+/* ================================================================
+   START
+   ================================================================ */
+
 init();
+
 </script>
+
 </body>
 </html>
+```
